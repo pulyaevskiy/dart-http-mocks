@@ -1,7 +1,7 @@
 part of http_mocks;
 
-/// Checks if response status is the same as [statusCode].
-Matcher responseStatus(int statusCode) => new _ResponseStatus(statusCode);
+/// Checks if response status is the same as [expected].
+Matcher responseStatus(int expected) => new _ResponseStatus(expected);
 
 class _ResponseStatus extends Matcher {
   final int expectedStatus;
@@ -10,28 +10,27 @@ class _ResponseStatus extends Matcher {
 
   @override
   Description describe(Description description) {
-    return description.add('response status ').addDescriptionOf(expectedStatus);
+    return description
+        .add('response status is ')
+        .addDescriptionOf(expectedStatus);
   }
 
   @override
   Description describeMismatch(
       item, Description mismatchDescription, Map matchState, bool verbose) {
     if (item is HttpRequestMock) {
-      var actual = matchState['actualStatus'];
-      mismatchDescription.add('response status ');
-      mismatchDescription.addDescriptionOf(actual);
+      mismatchDescription.add('response status is ');
+      mismatchDescription.addDescriptionOf(item.responseMock.statusCode);
       return super
           .describeMismatch(item, mismatchDescription, matchState, verbose);
     } else {
-      return mismatchDescription.add('is not an instance of HttpResponseMock');
+      return mismatchDescription.add('is not an instance of HttpRequestMock');
     }
   }
 
   @override
   bool matches(item, Map matchState) {
     if (item is HttpRequestMock) {
-      matchState['actualStatus'] = item.responseMock.statusCode;
-
       return (item.responseMock.statusCode == expectedStatus);
     } else {
       return false;
