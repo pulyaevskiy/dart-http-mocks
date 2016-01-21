@@ -61,6 +61,28 @@ class _ResponseBody extends Matcher {
       return false;
     }
   }
+
+  @override
+  Description describeMismatch(
+      item, Description mismatchDescription, Map matchState, bool verbose) {
+    if (item is HttpRequestMock) {
+      if (item.responseMock.body == null) {
+        mismatchDescription.add('response body is ').addDescriptionOf(null);
+      } else {
+        mismatchDescription.add('response body is\n').add('          ```\n');
+        var lines = item.responseMock.body.split('\n');
+        for (var line in lines) {
+          mismatchDescription.add('          ${line}\n');
+        }
+        mismatchDescription.add('          ```');
+      }
+
+      return super
+          .describeMismatch(item, mismatchDescription, matchState, verbose);
+    } else {
+      return mismatchDescription.add('is not an instance of HttpRequestMock');
+    }
+  }
 }
 
 /// Checks if `response.close()` has been called.
