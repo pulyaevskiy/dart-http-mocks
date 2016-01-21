@@ -92,15 +92,27 @@ class _ResponseSent extends Matcher {
 
   @override
   Description describe(Description description) {
-    return description.add('response has been sent');
+    return description.add('response is closed');
   }
 
   @override
   bool matches(item, Map matchState) {
     if (item is HttpRequestMock) {
-      return (item.responseMock.isClosed);
+      return item.responseMock.isClosed;
     } else {
       return false;
+    }
+  }
+
+  @override
+  Description describeMismatch(
+      item, Description mismatchDescription, Map matchState, bool verbose) {
+    if (item is HttpRequestMock) {
+      mismatchDescription.add('response is not closed');
+      return super
+          .describeMismatch(item, mismatchDescription, matchState, verbose);
+    } else {
+      return mismatchDescription.add('is not an instance of HttpRequestMock');
     }
   }
 }

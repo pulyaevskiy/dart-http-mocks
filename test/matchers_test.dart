@@ -91,4 +91,37 @@ void main() {
       expect(desc.toString(), equals("is not an instance of HttpRequestMock"));
     });
   });
+
+  group('ResponseSent:', () {
+    test('it matches if response has been closed', () {
+      var request = new HttpRequestMock(Uri.parse('/foo'), 'GET');
+      request.response.close();
+      var matcher = responseSent;
+      expect(matcher.matches(request, {}), isTrue);
+    });
+
+    test('it describes itself', () {
+      var matcher = responseSent;
+      var desc = new StringDescription();
+      matcher.describe(desc);
+      expect(desc.toString(), equals("response is closed"));
+    });
+
+    test('it describes mismatch', () {
+      var request = new HttpRequestMock(Uri.parse('/foo'), 'GET');
+      var matcher = responseSent;
+      expect(matcher.matches(request, {}), isFalse);
+
+      var desc = new StringDescription();
+      matcher.describeMismatch(request, desc, {}, false);
+      expect(desc.toString(), equals("response is not closed"));
+    });
+
+    test('it describes mismatch for invalid input', () {
+      var desc = new StringDescription();
+      var matcher = responseStatus(HttpStatus.OK);
+      matcher.describeMismatch('just string', desc, {}, false);
+      expect(desc.toString(), equals("is not an instance of HttpRequestMock"));
+    });
+  });
 }
