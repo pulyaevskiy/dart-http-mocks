@@ -124,4 +124,44 @@ void main() {
       expect(desc.toString(), equals("is not an instance of HttpRequestMock"));
     });
   });
+
+  group('ResponseContentType:', () {
+    test('it matches response content type', () {
+      var request = new HttpRequestMock(Uri.parse('/foo'), 'GET');
+      request.response.headers.contentType = ContentType.BINARY;
+      request.response.headers.contentType = ContentType.JSON;
+      var matcher = responseContentType(ContentType.JSON);
+      expect(matcher.matches(request, {}), isTrue);
+    });
+
+    test('it describes itself', () {
+      var matcher = responseContentType(ContentType.JSON);
+      var desc = new StringDescription();
+      matcher.describe(desc);
+      expect(
+          desc.toString(),
+          equals(
+              "response content type is ?:<application/json; charset=utf-8>"));
+    });
+
+    test('it describes mismatch', () {
+      var request = new HttpRequestMock(Uri.parse('/foo'), 'GET');
+      request.response.headers.contentType = ContentType.TEXT;
+      var matcher = responseContentType(ContentType.JSON);
+      var state = {};
+      expect(matcher.matches(request, state), isFalse);
+
+      var desc = new StringDescription();
+      matcher.describeMismatch(request, desc, state, false);
+      expect(desc.toString(),
+          equals("response content type is ?:<text/plain; charset=utf-8>"));
+    });
+
+    test('it describes mismatch for invalid input', () {
+      var desc = new StringDescription();
+      var matcher = responseContentType(ContentType.JSON);
+      matcher.describeMismatch('not a request', desc, {}, false);
+      expect(desc.toString(), equals("is not an instance of HttpRequestMock"));
+    });
+  });
 }

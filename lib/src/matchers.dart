@@ -128,7 +128,9 @@ class _ResponseContentType extends Matcher {
 
   @override
   Description describe(Description description) {
-    return description.add('response content type ').addDescriptionOf(expected);
+    return description
+        .add('response content type is ')
+        .addDescriptionOf(expected);
   }
 
   @override
@@ -136,7 +138,7 @@ class _ResponseContentType extends Matcher {
       item, Description mismatchDescription, Map matchState, bool verbose) {
     if (item is HttpRequestMock) {
       var actual = matchState['actualType'];
-      mismatchDescription.add('response content type ');
+      mismatchDescription.add('response content type is ');
       mismatchDescription.addDescriptionOf(actual);
       return super
           .describeMismatch(item, mismatchDescription, matchState, verbose);
