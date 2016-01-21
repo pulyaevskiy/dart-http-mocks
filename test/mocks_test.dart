@@ -1,4 +1,4 @@
-library http_mocks.tests.mock;
+library http_mocks.tests.mocks;
 
 import 'dart:async';
 import 'dart:convert';
