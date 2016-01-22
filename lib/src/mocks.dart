@@ -7,7 +7,7 @@ class HttpRequestMock extends Mock implements HttpRequest {
   final HttpHeadersMock responseHeadersMock = new HttpHeadersMock();
 
   HttpRequestMock(Uri uri, String method,
-      {String body, Map<String, dynamic> headers}) {
+      {String body, Map<String, String> headers}) {
     when(this.requestedUri).thenReturn(uri);
     when(this.method).thenReturn(method);
     when(this.headers).thenReturn(headersMock);
@@ -21,17 +21,7 @@ class HttpRequestMock extends Mock implements HttpRequest {
     }
 
     if (headers is Map && headers.isNotEmpty) {
-      for (var key in headers.keys) {
-        if (headers[key] is String) {
-          when(headersMock.value(key)).thenReturn(headers[key]);
-          when(headersMock[key]).thenReturn([headers[key]]);
-        } else if (headers[key] is List) {
-          when(headersMock[key]).thenReturn(headers[key]);
-        } else {
-          throw new ArgumentError.value(headers, 'headers',
-              'Header value can only be string or list of strings');
-        }
-      }
+      headersMock._headers.addAll(headers);
     }
   }
 }
@@ -82,4 +72,48 @@ class HttpResponseMock extends Mock implements HttpResponse {
 }
 
 /// Mock for [HttpHeaders].
-class HttpHeadersMock extends Mock implements HttpHeaders {}
+///
+/// Please note that it does not support multi-value headers.
+class HttpHeadersMock extends Mock implements HttpHeaders {
+  Map<String, String> _headers;
+  HttpHeadersMock([Map<String, String> headers])
+      : _headers = headers ?? new Map();
+
+  @override
+  List<String> operator [](String name) {
+    return _headers.containsKey(name) ? [_headers[name]] : null;
+  }
+
+  @override
+  String value(String name) {
+    // TODO: for multi-value headers (when supported) this should throw an exception
+    return _headers.containsKey(name) ? _headers[name] : null;
+  }
+
+  @override
+  void add(String name, Object value) {
+    // TODO: add value for multi-value headers instead of overwriting
+    _headers[name] = value;
+  }
+
+  @override
+  void set(String name, Object value) {
+    // TODO: clear existing multi-value headers first.
+    _headers[name] = value;
+  }
+
+  @override
+  void remove(String name, Object value) {
+    _headers.remove(name);
+  }
+
+  @override
+  void removeAll(String name) {
+    _headers.remove(name);
+  }
+
+  @override
+  void clear() {
+    _headers.clear();
+  }
+}

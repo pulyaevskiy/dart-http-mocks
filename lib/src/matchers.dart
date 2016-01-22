@@ -164,8 +164,10 @@ class _ResponseContentType extends Matcher {
 
 /// Checks if response's headers match with provided [matcher].
 ///
-/// It is recommended to use `containsPair()` matcher. Behavior of `equals`
-/// matcher may not be consistent.
+/// This will only validate headers that were set during handling of the
+/// request. Any system suplied default headers are not reflected in the mock.
+///
+/// It is recommended to use `containsPair()` with this matcher.
 Matcher responseHeaders(Matcher matcher) => new _ResponseHeaders(matcher);
 
 class _ResponseHeaders extends Matcher {
@@ -181,21 +183,7 @@ class _ResponseHeaders extends Matcher {
   @override
   bool matches(item, Map matchState) {
     if (item is HttpRequestMock) {
-      var args = verify(item.responseHeadersMock.add(captureAny, captureAny))
-          .captured
-          .toList();
-      var hasMatch = false;
-      var actualHeaders = new List();
-      while (args.isNotEmpty) {
-        var key = args.removeAt(0);
-        var value = args.removeAt(0);
-        actualHeaders.add({key: value});
-        if (matcher.matches({key: value}, matchState)) {
-          hasMatch = true;
-        }
-      }
-      matchState['actualHeaders'] = actualHeaders;
-      return hasMatch;
+      return matcher.matches(item.responseHeadersMock._headers, matchState);
     } else {
       return false;
     }
@@ -205,8 +193,8 @@ class _ResponseHeaders extends Matcher {
   Description describeMismatch(
       item, Description mismatchDescription, Map matchState, bool verbose) {
     if (item is HttpRequestMock) {
-      var actual = matchState['actualHeaders'];
-      mismatchDescription.add('response headers contains ');
+      var actual = item.responseHeadersMock._headers;
+      mismatchDescription.add('response headers are ');
       mismatchDescription.addDescriptionOf(actual);
       return super
           .describeMismatch(item, mismatchDescription, matchState, verbose);

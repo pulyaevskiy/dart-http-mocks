@@ -119,7 +119,7 @@ void main() {
 
     test('it describes mismatch for invalid input', () {
       var desc = new StringDescription();
-      var matcher = responseStatus(HttpStatus.OK);
+      var matcher = responseSent;
       matcher.describeMismatch('just string', desc, {}, false);
       expect(desc.toString(), equals("is not an instance of HttpRequestMock"));
     });
@@ -160,6 +160,49 @@ void main() {
     test('it describes mismatch for invalid input', () {
       var desc = new StringDescription();
       var matcher = responseContentType(ContentType.JSON);
+      matcher.describeMismatch('not a request', desc, {}, false);
+      expect(desc.toString(), equals("is not an instance of HttpRequestMock"));
+    });
+  });
+
+  group('ResponseHeaders:', () {
+    test('it matches response header', () {
+      var matcher = responseHeaders(containsPair('WWW-Authenticate', 'Basic'));
+
+      var request = new HttpRequestMock(Uri.parse('/foo'), 'GET');
+      request.response.headers.add('WWW-Authenticate', 'Basic');
+      expect(matcher.matches(request, {}), isTrue);
+
+      request = new HttpRequestMock(Uri.parse('/foo'), 'GET');
+      request.response.headers.set('WWW-Authenticate', 'Basic');
+      expect(matcher.matches(request, {}), isTrue);
+    });
+
+    test('it describes itself', () {
+      var matcher = responseHeaders(containsPair('WWW-Authenticate', 'Basic'));
+      var desc = new StringDescription();
+      matcher.describe(desc);
+      expect(
+          desc.toString(),
+          equals(
+              "response headers that contains pair \'WWW-Authenticate\' => \'Basic\'"));
+    });
+
+    test('it describes mismatch', () {
+      var request = new HttpRequestMock(Uri.parse('/foo'), 'GET');
+      request.response.headers.add('X-Foo', 'Bar');
+      var matcher = responseHeaders(containsPair('WWW-Authenticate', 'Basic'));
+      expect(matcher.matches(request, {}), isFalse);
+
+      var desc = new StringDescription();
+      matcher.describeMismatch(request, desc, {}, false);
+      expect(
+          desc.toString(), equals("response headers are {\'X-Foo\': \'Bar\'}"));
+    });
+
+    test('it describes mismatch for invalid input', () {
+      var desc = new StringDescription();
+      var matcher = responseHeaders(containsPair('WWW-Authenticate', 'Basic'));
       matcher.describeMismatch('not a request', desc, {}, false);
       expect(desc.toString(), equals("is not an instance of HttpRequestMock"));
     });
