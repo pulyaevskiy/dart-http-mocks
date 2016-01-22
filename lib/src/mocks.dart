@@ -2,10 +2,16 @@ part of http_mocks;
 
 /// Mock for [HttpRequest].
 class HttpRequestMock extends Mock implements HttpRequest {
+  /// Mock for this request's headers.
   final HttpHeadersMock headersMock = new HttpHeadersMock();
+
+  /// Response mock.
   final HttpResponseMock responseMock = new HttpResponseMock();
+
+  /// Response headers mock.
   final HttpHeadersMock responseHeadersMock = new HttpHeadersMock();
 
+  /// Creates new mock for [HttpRequest].
   HttpRequestMock(Uri uri, String method,
       {String body, Map<String, String> headers}) {
     when(this.requestedUri).thenReturn(uri);
@@ -33,8 +39,10 @@ class HttpResponseMock extends Mock implements HttpResponse {
 
   String _body;
 
+  /// Body of this response.
   String get body => _body;
 
+  /// Returns `true` if response has been closed.
   bool get isClosed => _closeFuture is Future;
 
   @override
