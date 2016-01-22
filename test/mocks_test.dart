@@ -8,6 +8,21 @@ import 'package:http_mocks/http_mocks.dart';
 import 'package:test/test.dart';
 
 void main() {
+  group('HttpRequestMock:', () {
+    test('it provides access to headers', () {
+      var request = new HttpRequestMock(Uri.parse('/users'), 'GET',
+          headers: {'X-Foo': 'Bar'});
+      expect(request.headers.value('X-Foo'), equals('Bar'));
+      expect(request.headers['X-Foo'], equals(['Bar']));
+    });
+
+    test('it provides access to the body', () async {
+      var request = new HttpRequestMock(Uri.parse('/h'), 'GET', body: 'Hello');
+      var body = await UTF8.decodeStream(request);
+      expect(body, equals('Hello'));
+    });
+  });
+
   group('HttpResponseMock:', () {
     test('it can verify response status code', () {
       var request = new HttpRequestMock(Uri.parse('/users'), 'GET');

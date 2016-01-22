@@ -101,19 +101,4 @@ class HttpHeadersMock extends Mock implements HttpHeaders {
     // TODO: clear existing multi-value headers first.
     _headers[name] = value;
   }
-
-  @override
-  void remove(String name, Object value) {
-    _headers.remove(name);
-  }
-
-  @override
-  void removeAll(String name) {
-    _headers.remove(name);
-  }
-
-  @override
-  void clear() {
-    _headers.clear();
-  }
 }

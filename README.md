@@ -51,8 +51,9 @@ Current implementation only covers only a subset of all possible use cases,
 though hopefully the most common ones. This means that not all the expectations
 can be performed.
 
-Also, the `HttpHeadersMock` does not support "multi-value" headers at
-this moment (but this can be added in the future, of course).
+* The `HttpHeadersMock` does not support "multi-value" headers at
+  this moment (but this can be added in the future, of course).
+* Reading of request body assumes you will use `UTF8.decodeStream()`.
 
 If you find a use case which is not covered, feel free to create an issue or a
 pull request!
