@@ -109,4 +109,11 @@ class HttpHeadersMock extends Mock implements HttpHeaders {
     // TODO: clear existing multi-value headers first.
     _headers[name] = value;
   }
+
+  @override
+  void forEach(void f(String name, List<String> values)) {
+    _headers.forEach((k, v) {
+      f(k, [v]);
+    });
+  }
 }
