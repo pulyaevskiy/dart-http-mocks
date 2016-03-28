@@ -2,6 +2,9 @@ part of http_mocks;
 
 /// Mock for [HttpRequest].
 class HttpRequestMock extends Mock implements HttpRequest {
+  /// Original request body.
+  final String body;
+
   /// Mock for this request's headers.
   final HttpHeadersMock headersMock = new HttpHeadersMock();
 
@@ -13,7 +16,7 @@ class HttpRequestMock extends Mock implements HttpRequest {
 
   /// Creates new mock for [HttpRequest].
   HttpRequestMock(Uri uri, String method,
-      {String body, Map<String, String> headers}) {
+      {this.body, Map<String, String> headers}) {
     when(this.requestedUri).thenReturn(uri);
     when(this.method).thenReturn(method);
     when(this.headers).thenReturn(headersMock);
